@@ -2,6 +2,8 @@ package com.cloud.service;
 
 import com.cloud.ViewModel.ProjectVM;
 import com.cloud.model.KickStarter;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Row;
 
 import java.util.List;
 

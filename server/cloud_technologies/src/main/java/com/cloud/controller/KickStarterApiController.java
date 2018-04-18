@@ -3,6 +3,8 @@ package com.cloud.controller;
 import com.cloud.ViewModel.ProjectVM;
 import com.cloud.model.KickStarter;
 import com.cloud.service.IKickStarterService;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Row;
 import org.apache.spark.sql.catalyst.plans.logical.Project;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +38,11 @@ public class KickStarterApiController {
     @RequestMapping(value = "/projects",method = RequestMethod.POST)
     Callable<ResponseEntity<List<KickStarter>>> getProjects(@RequestBody ProjectVM projectVM) {
         List<KickStarter> kickStarterList = this.starterService.findProjects(projectVM);
+        /*for(Row row : kickStarterList){
+            System.out.println(row);
+        }*/
+        System.out.println("++++++++++++++++++++++++++");
+        System.out.println(kickStarterList.size());
         return () -> ResponseEntity.ok(kickStarterList);
     }
 
