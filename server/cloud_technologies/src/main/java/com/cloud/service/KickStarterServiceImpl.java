@@ -3,13 +3,18 @@ package com.cloud.service;
 import com.cloud.ViewModel.ProjectVM;
 import com.cloud.config.CSVReader;
 import com.cloud.model.KickStarter;
+import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.RelationalGroupedDataset;
+import org.apache.spark.sql.Row;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.xml.crypto.Data;
 import java.text.MessageFormat;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static org.apache.spark.sql.functions.col;
 
@@ -37,13 +42,24 @@ public class KickStarterServiceImpl implements IKickStarterService {
 
     @Override
     public List<KickStarter> findProjects(ProjectVM projectVM) {
-        MessageFormat fmt = new MessageFormat("%{0}%");
         Dataset<KickStarter> dataset = csvReader.getCSVRecords();
+
+        Column main_categoryColumn = col("main_category").isNotNull();
+        Column categoryColumn = col("category").isNotNull();
+        Column countryColumn = col("country").isNotNull();
+
+        if(!projectVM.getCategory().equals("")){
+            main_categoryColumn =  col("main_category").like("%" + projectVM.getCategory() + "%");
+        }
+        if(!projectVM.getSubCategory().equals("")){
+            categoryColumn = (col("category").like("%" + projectVM.getSubCategory() + "%"));
+        }
+        if(!projectVM.getCountry().equals("")){
+            countryColumn = col("country").equalTo(projectVM.getCountry());
+        }
+
         Dataset<KickStarter> searched =
-                dataset.where(
-                        col("main_category").like("%" + projectVM.getCategory() + "%")
-                                .and(col("category").like("%" + projectVM.getSubCategory() + "%"))
-                                .and(col("country").equalTo(projectVM.getCountry())))
+                dataset.where(main_categoryColumn.and(categoryColumn).and(countryColumn))
                         .orderBy(col("ID").desc());
         dataset.show();
         //Dataset<KickStarter> rows = dataset.;
@@ -96,5 +112,45 @@ public class KickStarterServiceImpl implements IKickStarterService {
         return rowList;
     }
 
+    public List<String> getCategoryList(){
+        Dataset<KickStarter> dataset = csvReader.getCSVRecords();
+        Column[] colList =  { col("main_category")};
+        Dataset<Row> searched = dataset.select(colList).orderBy(col("main_category").asc()).distinct();
+        searched.show();
+
+        List<Row> rowList = searched.collectAsList();
+        List<String> rows = rowList.stream().map((Row row)->new String(row.getString(0)))
+                .collect(Collectors.toList());
+
+        return rows;
+    }
+
+    @Override
+    public List<String> getSubCategoryList() {
+        Dataset<KickStarter> dataset = csvReader.getCSVRecords();
+        Column[] colList =  { col("category")};
+        Dataset<Row> searched = dataset.select(colList).orderBy(col("category").asc()).distinct();
+        searched.show();
+
+        List<Row> rowList = searched.collectAsList();
+        List<String> rows = rowList.stream().map((Row row)->new String(row.getString(0)))
+                .collect(Collectors.toList());
+
+        return rows;
+    }
+
+    @Override
+    public List<String> getCountryList() {
+        Dataset<KickStarter> dataset = csvReader.getCSVRecords();
+        Column[] colList =  { col("country")};
+        Dataset<Row> searched = dataset.select(colList).distinct().orderBy(col("country").asc());
+        //searched.show();
+
+        List<Row> rowList = searched.collectAsList();
+        List<String> rows = rowList.stream().map((Row row)->new String(row.getString(0)))
+                .collect(Collectors.toList());
+
+        return rows;
+    }
 
 }

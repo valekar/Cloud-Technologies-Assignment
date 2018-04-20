@@ -11,4 +11,9 @@ public interface IKickStarterService {
     void test();
 
      List<KickStarter> findProjects(ProjectVM projectVM);
+
+     List<String> getCategoryList();
+
+     List<String> getSubCategoryList();
+     List<String> getCountryList();
 }

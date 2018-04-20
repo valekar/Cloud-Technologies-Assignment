@@ -46,4 +46,22 @@ public class KickStarterApiController {
         return () -> ResponseEntity.ok(kickStarterList);
     }
 
+    @RequestMapping(value = "/categories",method = RequestMethod.GET)
+    Callable<ResponseEntity<List<String>>> getCategoryList(){
+        List<String> categoryList = this.starterService.getCategoryList();
+        return ()-> ResponseEntity.ok(categoryList);
+    }
+
+    @RequestMapping(value = "/sub/categories",method = RequestMethod.GET)
+    Callable<ResponseEntity<List<String>>> getSubCategoryList(){
+        List<String> subCategoryList = this.starterService.getSubCategoryList();
+        return ()-> ResponseEntity.ok(subCategoryList);
+    }
+
+
+    @RequestMapping(value = "/countries",method = RequestMethod.GET)
+    Callable<ResponseEntity<List<String>>> getCountryList(){
+        List<String> countryList = this.starterService.getCountryList();
+        return ()-> ResponseEntity.ok(countryList);
+    }
 }
