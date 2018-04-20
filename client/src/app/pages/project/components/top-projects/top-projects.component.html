@@ -28,7 +28,7 @@
 
             <div class="col-4">
               <div class="form-group">
-                <label>Select Country</label>
+                <label>Select Country Code</label>
                 <select class="form-control ng-untouched ng-pristine ng-valid" formControlName="country">
                     <option></option>
                   <option *ngFor="let country of countries" [ngValue]="country">{{country}}</option>
@@ -36,7 +36,7 @@
               </div>
             </div>
 
-            <button type="submit" class="btn btn-primary pull-right btn-xm" 
+            <button type="submit" class="btn btn-primary pull-right mt-2 btn-xm" 
             [disabled]="!(countries && categories && subCategories && enabled)">Submit</button>
 
 

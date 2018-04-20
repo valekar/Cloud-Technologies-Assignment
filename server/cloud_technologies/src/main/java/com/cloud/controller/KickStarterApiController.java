@@ -2,6 +2,7 @@ package com.cloud.controller;
 
 import com.cloud.ViewModel.ProjectVM;
 import com.cloud.model.KickStarter;
+import com.cloud.model.TotalPledge;
 import com.cloud.service.IKickStarterService;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -45,6 +46,13 @@ public class KickStarterApiController {
         System.out.println(kickStarterList.size());
         return () -> ResponseEntity.ok(kickStarterList);
     }
+
+    @RequestMapping(value = "/category/total/pledge",method = RequestMethod.POST)
+    Callable<ResponseEntity<List<TotalPledge>>> getTotalAmountByCategory(@RequestBody ProjectVM projectVM) {
+        List<TotalPledge> totalPledges = this.starterService.getTotalAmountByCategory(projectVM);
+        return () -> ResponseEntity.ok(totalPledges);
+    }
+
 
     @RequestMapping(value = "/categories",method = RequestMethod.GET)
     Callable<ResponseEntity<List<String>>> getCategoryList(){

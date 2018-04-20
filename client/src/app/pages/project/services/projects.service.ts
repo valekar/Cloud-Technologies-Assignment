@@ -20,7 +20,15 @@ export class ProjectsService {
     //this.spinner.load();
     return this.http.post(URLS.GET_TOP_PROJECTS,postVM,this.commonService.getHeaderOptions())
       .map((res:Response)=> {
-        //this.spinner.clear();
+        return res.json()}
+      )
+      .catch((err:Response)=> {return Observable.throw(err.json())});
+  }
+
+
+  getTotalPledged(postVM:ProjectVM){
+    return this.http.post(URLS.GET_TOTAL_PLEDGED,postVM,this.commonService.getHeaderOptions())
+      .map((res:Response)=> {
         return res.json()}
       )
       .catch((err:Response)=> {return Observable.throw(err.json())});

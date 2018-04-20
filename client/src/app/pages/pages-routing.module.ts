@@ -2,6 +2,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { NgModule } from '@angular/core';
 import { PagesComponent } from './pages.component';
 import {TopProjectsComponent} from './project/components/top-projects/top-projects.component';
+import {TotalPledgeComponent} from './project/components/total-pledge/total-pledge.component';
 
 const routes: Routes = [{
   path: '',
@@ -10,6 +11,10 @@ const routes: Routes = [{
     {
       path:'',
       component:TopProjectsComponent
+    },
+    {
+      path:'total/pledge',
+      component:TotalPledgeComponent
     }
 
 ],

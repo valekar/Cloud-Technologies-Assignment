@@ -8,4 +8,5 @@ export class URLS{
     public static GET_SUB_CATEGORIES = URLS.cloud_provider + "/api/sub/categories/";
     public static GET_COUNTRIES = URLS.cloud_provider + "/api/countries/";
     public static GET_TOP_PROJECTS = URLS.cloud_provider + "/api/projects/";
+    public static GET_TOTAL_PLEDGED = URLS.cloud_provider + "/api/category/total/pledge"
 }

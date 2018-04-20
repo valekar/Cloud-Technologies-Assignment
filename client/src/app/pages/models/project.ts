@@ -31,3 +31,9 @@ export class KickStarter{
     usd_pledged_real:String;
     usd_goal_real:String;
 }
+
+export class TotalPledge{
+    category:String;
+    pledged:String;
+    backers:String;
+}

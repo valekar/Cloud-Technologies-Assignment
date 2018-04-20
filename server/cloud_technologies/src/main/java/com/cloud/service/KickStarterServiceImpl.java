@@ -3,6 +3,7 @@ package com.cloud.service;
 import com.cloud.ViewModel.ProjectVM;
 import com.cloud.config.CSVReader;
 import com.cloud.model.KickStarter;
+import com.cloud.model.TotalPledge;
 import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.RelationalGroupedDataset;
@@ -10,10 +11,7 @@ import org.apache.spark.sql.Row;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.xml.crypto.Data;
-import java.text.MessageFormat;
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.apache.spark.sql.functions.col;
@@ -80,35 +78,6 @@ public class KickStarterServiceImpl implements IKickStarterService {
                 .and(col("usd_goal_real").isNotNull())
         );
         List<KickStarter> rowList = rows.orderBy(col("usd_pledged_real").desc()).limit(100).collectAsList();
-        //RelationalGroupedDataset groupedDataset = dataset.groupBy(col("main_category"));
-
-        //List<Row> rowList = rows.orderBy(col("usd_pledged_real").desc()).limit(100).collectAsList();
-
-        /*List<KickStarter> kickStarters = rowList.stream().map(new Function<Row, KickStarter>() {
-            @Override
-            public KickStarter apply(Row row) {
-                //System.out.println("+++++++++++++++++++ROW++++++++++++++===");
-                //System.out.println(row);
-
-                return new KickStarter(row.getInt(0),
-                        row.getString(1),
-                        row.getString(2),
-                        row.getString(3),
-                        row.getString(4),
-                        row.getString(5),
-                        row.getDouble(6),
-                        row.getString(7),
-                        row.getDouble(8),
-                        row.getString(9),
-                        row.getInt(10),
-                        row.getString(11),
-                        row.getDouble(12),
-                        row.getDouble(13),
-                        row.getDouble(14)
-                );
-            }
-        }).collect(Collectors.toList());*/
-        //return rows;
         return rowList;
     }
 
@@ -153,4 +122,63 @@ public class KickStarterServiceImpl implements IKickStarterService {
         return rows;
     }
 
+    @Override
+    public List<TotalPledge> getTotalAmountByCategory(ProjectVM projectVM) {
+        Dataset<KickStarter> dataSet = csvReader.getCSVRecords();
+
+        Column categoryColumn = col("main_category").like("%"+projectVM.getCategory()+"%");
+        Column countryColumn = col("country").like(("%"+projectVM.getCountry()+"%"));
+
+        if(projectVM.getCategory().equals("")){
+            categoryColumn = col("main_category").isNotNull();
+        }
+        if(projectVM.getCountry().equals("")){
+            countryColumn = col("country").isNotNull();
+        }
+        Dataset<KickStarter> filtered = dataSet.where(categoryColumn.and(countryColumn));
+        RelationalGroupedDataset groupedDataset = filtered.groupBy(col("main_category"));
+        String[] colList = new String[]{"pledged", "backers"};
+        //groupedDataset.sum(colList).show();
+        List<Row> finalSet = groupedDataset.sum(colList).orderBy(col("main_category").asc()).collectAsList();
+
+        List<TotalPledge> totalPledges = finalSet.stream().map((Row row)->
+                new TotalPledge(row.getString(0),row.getDouble(1),row.getLong(2))
+        ).collect(Collectors.toList());
+
+        return totalPledges;
+
+    }
+
 }
+
+
+
+//RelationalGroupedDataset groupedDataset = dataset.groupBy(col("main_category"));
+
+//List<Row> rowList = rows.orderBy(col("usd_pledged_real").desc()).limit(100).collectAsList();
+
+        /*List<KickStarter> kickStarters = rowList.stream().map(new Function<Row, KickStarter>() {
+            @Override
+            public KickStarter apply(Row row) {
+                //System.out.println("+++++++++++++++++++ROW++++++++++++++===");
+                //System.out.println(row);
+
+                return new KickStarter(row.getInt(0),
+                        row.getString(1),
+                        row.getString(2),
+                        row.getString(3),
+                        row.getString(4),
+                        row.getString(5),
+                        row.getDouble(6),
+                        row.getString(7),
+                        row.getDouble(8),
+                        row.getString(9),
+                        row.getInt(10),
+                        row.getString(11),
+                        row.getDouble(12),
+                        row.getDouble(13),
+                        row.getDouble(14)
+                );
+            }
+        }).collect(Collectors.toList());*/
+//return rows;
